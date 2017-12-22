@@ -17,7 +17,7 @@ This is a Low-layer Support Library for KinetisKE MCUs of NXP/Freescale, I calle
 
     ```asm
     KinetisKEA_CSL  
-     	+-----inc\
+        +-----inc\
         |-----------\ KinetisKE_csl.h  
         |-----------\ KinetisKE_csl_assert.h  
         |-----------\ KinetisKE_csl_clk.h  
@@ -102,6 +102,24 @@ This is a Low-layer Support Library for KinetisKE MCUs of NXP/Freescale, I calle
 5. 其他详细配置请见工程模板
 
 6. 具体使用请见例程
+
+
+
+#### Documents
+
+?	[使用帮助](./Documents/Overview.md) 请点击此链接
+
+#### 更新日志
+
+ version 0.0.1 (2017.12.4)
+
+1. 仅提供工程模板
+
+version 0.2.5 (2017.12.22)
+
+1. 修复了大量bug
+2. 提供对UART，PWT，PMC，FLASH的支持
+3. 其他模块正在完善中
 
 Copyright &copy; Yangtze University, Stark-Zhang, All rights reserved  
 Copyright &copy; 长江大学 电子信息学院 张璞 保留所有权利
