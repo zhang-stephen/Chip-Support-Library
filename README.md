@@ -103,8 +103,6 @@ This is a Low-layer Support Library for KinetisKE MCUs of NXP/Freescale, I calle
 
 6. 具体使用请见例程
 
-
-
 #### Documents
 
 ?	[使用帮助](./Documents/Overview.md) 请点击此链接
