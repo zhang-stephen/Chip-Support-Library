@@ -80,6 +80,7 @@
 
 #### 支持的外设及其帮助
 
++ [ADC](./peripherals/adc.md)  
 + [Coretex](./peripherals/cortex.md)
 + [Clock](./peripherals/clock.md)
 + [Flash](./peripherals/ftmre.md)
