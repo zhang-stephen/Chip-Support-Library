@@ -128,7 +128,7 @@ typedef enum
    Available memory areas are declared in the 'Target' tab of the 'Options for Target'
    dialog. 
 */
-#define __RAM_FUNC HAL_StatusTypeDef 
+#define __RAM_FUNC CSL_StatusTypeDef 
 
 #elif defined ( __ICCARM__ )
 /* ICCARM Compiler

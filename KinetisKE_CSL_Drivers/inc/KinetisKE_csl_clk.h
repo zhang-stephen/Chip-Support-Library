@@ -218,7 +218,7 @@ void CSL_ICS_Callback(void);
 
 #define IS_Bus_PSC(x)			(((x) == Bus_CLK_DIV0) || \
 								 ((x) == Bus_CLK_DIV1))
-#define IS_CLK_BUSREF(x)	(((x+1) >= 0x01u) && (x <= 0x07u))
+#define IS_CLK_BUSREF(x)		(((x+1) >= 0x01u) && (x <= 0x07u))
 
 #ifdef __cplusplus
  }

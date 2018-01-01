@@ -77,11 +77,11 @@
 #define __CSL_SWD_CLK_ENABLE()              (SIM->SCGC |= SIM_SCGC_SWD_MASK)
 #define __CSL_FLASH_CLK_ENABLE()            (SIM->SCGC |= SIM_SCGC_FLASH_MASK)
 #define __CSL_CRC_CLK_ENABLE()              (SIM->SCGC |= SIM_SCGC_CRC_MASK)
-#define __CSL_FIM2_CLK_ENABLE()             (SIM->SCGC |= SIM_SCGC_FTM2_MASK)
-#define __CSL_FIM1_CLK_ENABLE()             (SIM->SCGC |= SIM_SCGC_FTM1_MASK)
-#define __CSL_FIM0_CLK_ENABLE()             (SIM->SCGC |= SIM_SCGC_FTM0_MASK)
+#define __CSL_FTM2_CLK_ENABLE()             (SIM->SCGC |= SIM_SCGC_FTM2_MASK)
+#define __CSL_FTM1_CLK_ENABLE()             (SIM->SCGC |= SIM_SCGC_FTM1_MASK)
+#define __CSL_FTM0_CLK_ENABLE()             (SIM->SCGC |= SIM_SCGC_FTM0_MASK)
 #define __CSL_PWT_CLK_ENABLE()              (SIM->SCGC |= SIM_SCGC_PWT_MASK)
-#define __CSL_PIT_CLK_ENABLE()              (SIM->SCGC |= SIM_SCGC_CPIT_MASK)
+#define __CSL_PIT_CLK_ENABLE()              (SIM->SCGC |= SIM_SCGC_PIT_MASK)
 #define __CSL_RTC_CLK_ENABLE()              (SIM->SCGC |= SIM_SCGC_RTC_MASK)
 
 #define __CSL_ACMP1_CLK_DISABLE()            (SIM->SCGC &= ~SIM_SCGC_ACMP1_MASK)
@@ -105,7 +105,7 @@
 #define __CSL_FIM1_CLK_DISABLE()             (SIM->SCGC &= ~SIM_SCGC_FTM1_MASK)
 #define __CSL_FIM0_CLK_DISABLE()             (SIM->SCGC &= ~SIM_SCGC_FTM0_MASK)
 #define __CSL_PWT_CLK_DISABLE()              (SIM->SCGC &= ~SIM_SCGC_PWT_MASK)
-#define __CSL_PIT_CLK_DISABLE()              (SIM->SCGC &= ~SIM_SCGC_CPIT_MASK)
+#define __CSL_PIT_CLK_DISABLE()              (SIM->SCGC &= ~SIM_SCGC_PIT_MASK)
 #define __CSL_RTC_CLK_DISABLE()              (SIM->SCGC &= ~SIM_SCGC_RTC_MASK)
 
 #ifdef __cplusplus
