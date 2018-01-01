@@ -68,6 +68,89 @@ typedef struct
 
 ​	工程模板中提供了对于ADC进行基本初始化的例程，通过更改`__ADC_MODE`宏定义，可以实现单通道连续转换，4级FIFO连续转换，4级FIFO扫描模式等，具体请见例程
 
+#### FIFO
+
+此处提供一个保证FIFO次序的思路，针对各位参加电磁/电磁直立/无线节能的小伙伴们，当然如果使用外部ADC可忽略此步，此处亦提供使用硬件触发的初始化流程
+
+```C++
+//ADC Handle
+ADC_HandleTypeDef cadc = {0};
+
+//Global Array to store ADC Data
+uint16_t adc_data[0x20u] = {0};
+
+/**
+ * @brief	User ADC Template Code
+ * @basic configuration:
+ * 			ADC CLK = SystemBusClock / 2 / 2 = 6MHz
+ * 			ADC word length is 12bits
+ * 			ADC works in continuous mode
+ * 			Voltage Reference is VDDA pin
+ * @advanced configuration:
+ *			FIFO Mode is SET and its depth is 4-level
+ * 			Channel 0~3
+ * 			Trigged by PIT Channel 0
+**/
+void User_ADC_FIFO_Init(void)
+{
+	//enable ADC Clock
+  	__CSL_ADC_CLK_ENABLE();
+	
+  	//ADC Configuration
+  	cadc.Init.ConvMode = Continuous;
+	cadc.Init.Reference = ADC_REF_VDDA;
+	cadc.Init.Clock = ADC_CLK_BusClock_DIV2;
+	cadc.Init.PreScaler = ADC_CLK_DIV2;
+	cadc.Init.Length = ADC_DATA_LEN12;
+  	
+  	//Trigger
+  	cadc.Trigger.state = ADC_TRIG_HARDWARE;
+  	cadc.Trigger.HardTrigger = ADC_HTRIG_PITCH0;
+  
+  	//Compare is RESET
+	cadc.Compare.state = RESET;
+	
+  	//FIFO
+	cadc.FIFO.state = SET;			
+	cadc.FIFO.Depth = ADC_FIFO_D4;
+	cadc.FIFO.TrigMode = ADC_FTRIG_CONTINUOUS;
+	cadc.FIFO.Channel[0] = ADC_Channel_0;
+	cadc.FIFO.Channel[1] = ADC_Channel_1;
+	cadc.FIFO.Channel[2] = ADC_Channel_2;
+	cadc.FIFO.Channel[3] = ADC_Channel_3;
+  
+  	if(CSL_ADC_Init(&cadc) != CSL_OK)
+	{
+		__Error_Handler(__FILE__, __LINE__);
+	}
+}
+
+void CSL_ADC_MspInit(ADC_HandleTypeDef* cadc)
+{
+  	//Enable ADC Interrupt
+  	__CSL_ADC_IT_ENABLE();
+  	
+  	//NVIC SETTING
+  	CSL_NVIC_EnableIRQ(ADC_IRQn);
+  	CSL_NVIC_SetPriority(ADC_IRQn, 1);	//PIT Channel 0 is 1, too
+}
+
+//ADC Interrupt Callback
+void CSL_ADC_ConvCpltCallback(ADC_HandleTypeDef* cadc)
+{
+  	for(uint8_t i = 0; i < cadc.FIFO.Depth; i++)
+    {
+      	adc_data[ADC->SC1 & ADC_SC1_ADCH_MASK] = ADC->R;
+    }
+}
+
+//ADC Interrupt Function
+void ADC0_IRQHandler(void)
+{
+	CSL_ADC_IRQHandler(&cadc);
+}
+```
+
 
 
 Copyright &copy; Yangtze University EE Stark Zhang, All Rights Reserved 12.23.2017
