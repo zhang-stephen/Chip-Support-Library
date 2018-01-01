@@ -104,6 +104,7 @@
 + [PIT](./peripherals/pit.md)
 + [PMC](./peripherals/pmc.md)
 + [PWT](./peripherals/pwt.md)
++ [SPI](./peripherals/spi.md)
 + [UART](./peripherals/uart.md)
 + [WDOG](./peripherals/wdog.md)
 
