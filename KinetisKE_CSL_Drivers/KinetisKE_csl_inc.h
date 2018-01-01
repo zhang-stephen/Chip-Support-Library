@@ -3,7 +3,7 @@
  * License	GPLv2.0
  * Author	Stark Zhang
  * Debug	None
- * version	0.2.5(2017.12.22)
+ * version	0.4.2(2018.01.01)
 **/
 
 #ifndef __KinetisKE_CSL_INC_H
