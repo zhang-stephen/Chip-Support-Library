@@ -119,5 +119,13 @@ version 0.2.5 (2017.12.22)
 2. 提供对UART，PWT，PMC，FLASH的支持
 3. 其他模块正在完善中
 
+version 0.4.2 (2018.01.01)
+
+1. 修复部分Bug并更新了新的Bug
+2. 添加对ACMP、ADC、FTM、PIT和SPI的支持
+3. 提供的工程模板中添加KEIL-MDK模板，见MDK-ARM文件夹
+4. IAR工程根目录为模板目录下的EWARM文件夹
+5. 部分中间小版本未更新至GitHub
+
 Copyright &copy; Yangtze University, Stark-Zhang, All rights reserved  
 Copyright &copy; 长江大学 电子信息学院 张璞 保留所有权利
