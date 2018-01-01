@@ -21,7 +21,7 @@ static uint32_t uwTick = 0;
  * @return  None
  * @note    None
 **/
-__weak CSL_StatusTypeDef CSL_Init(void)
+CSL_StatusTypeDef CSL_Init(void)
 {
     /*SWD CLock Enable */
     __CSL_SWD_CLK_ENABLE();

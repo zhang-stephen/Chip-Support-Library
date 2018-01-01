@@ -23,7 +23,9 @@
 
 /* Modules in CSL for KinetsKE MCUs */
 #include "./inc/KinetisKE_csl.h"
-// #include "./inc/KinetisKE_csl_adc.h"
+#include "./inc/KinetisKE_csl_acmp.h" 
+#include "./inc/KinetisKE_csl_adc.h"
+#include "./inc/KinetisKE_csl_adc_ex.h"
 #include "./inc/KinetisKE_csl_clk.h"
 #include "./inc/KinetisKE_csl_cortex.h"
 #include "./inc/KinetisKE_csl_flash.h"
@@ -31,9 +33,10 @@
 #include "./inc/KinetisKE_csl_gpio.h"
 #include "./inc/KinetisKE_csl_gpio_ex.h"
 #include "./inc/KinetisKE_csl_irq.h"
+#include "./inc/KinetisKE_csl_pit.h"
 #include "./inc/KinetisKE_csl_pmc.h"
 #include "./inc/KinetisKE_csl_pwt.h"
-// #include "./inc/KinetisKE_csl_spi.h"
+//#include "./inc/KinetisKE_csl_spi.h"
 #include "./inc/KinetisKE_csl_uart.h"
 #include "./inc/KinetisKE_csl_wdog.h"
 

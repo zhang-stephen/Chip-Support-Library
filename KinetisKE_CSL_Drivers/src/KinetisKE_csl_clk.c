@@ -165,7 +165,7 @@ uint32_t CSL_CLK_GetBusFrequency(void)
 void CSL_ICS_IRQHandler(void)
 {
 	//FLL Loss of Lock
-	if ((ICS->S & ICS_S_LOLS_MASK) >> ICS_S_LOLS_SHIFT == 1)
+	if (__CSL_ICS_GetState(ICS_S_LOLS_MASK) == SET)
 	{
 		//Clear ICS->S[LOLS]
 		__ICS_FLL_CLEAR_FLAG();
