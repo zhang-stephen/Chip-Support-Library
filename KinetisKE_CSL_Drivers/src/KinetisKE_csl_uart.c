@@ -93,7 +93,7 @@ CSL_StatusTypeDef CSL_UART_DeInit(UART_HandleTypeDef* cuart)
 }
 
 /**
- * @brief	Configure UART as Internal Loop or Half Duplex
+ * @brief	Configure UART as Internal Loop or Half Duplex or Single Duplex
  * @param
  * @return
  * @note
@@ -554,17 +554,27 @@ __weak void CSL_UART_AbortCallback(UART_HandleTypeDef* cuart)
 **/
 void CSL_UART_IRQHandler(UART_HandleTypeDef* cuart)
 {
-	uint8_t uart_s1 = 0x00u, uart_s2 = 0x00u, bdhits = 0x00u, c2its = 0x00u;
-	uint8_t errorflags = 0x00u;
+	//Get Error Flags
+	uint8_t isr_flags = 0x00u, it_flags = 0x00u;
+	uint8_t s1_flag = cuart->Instance->S1;
+	uint8_t errorflags = __CSL_UART_GET_IT(cuart->Instance->C3, 0x0Fu) && __CSL_UART_GET_FLAG(s1_flag, 0x0Fu);
 	
-	//if no errors
-	errorflags = cuart->Instance->S1 & 0x0Fu;
+	//no error occured
 	if(errorflags == RESET)
 	{
-		//Rx Pin Edge Interrupt 
-		uart_s2 = cuart->Instance->BDH & UART_BDH_RXEDGIE_MASK;
-		bdhits = cuart->Instance->S2 & UART_S2_RXEDGIF_MASK;
-		if((uart_s2 & bdhits) != RESET)
+		//UARTx in Mode Receiver
+		it_flags = __CSL_UART_GET_IT(cuart->Instance->C2, UART_C2_RIE_MASK);
+		isr_flags = __CSL_UART_GET_FLAG(s1_flag, UART_S1_RDRF_MASK);
+		if((it_flags && isr_flags) == SET)
+		{
+			UART_Receive_IT(cuart);
+			return;
+		}
+		
+		//UARTx Rx Pin Level Interrupt
+		it_flags = __CSL_UART_GET_IT(cuart->Instance->BDH, UART_BDH_RXEDGIE_MASK);
+		isr_flags = __CSL_UART_GET_FLAG(cuart->Instance->S2, UART_S2_RXEDGIF_MASK);
+		if((it_flags && isr_flags) == SET)
 		{
 			//Clear Flags
 			cuart->Instance->S2 |= UART_S2_RXEDGIF_MASK;
@@ -575,21 +585,27 @@ void CSL_UART_IRQHandler(UART_HandleTypeDef* cuart)
 			return;
 		}
 		
-		//UART in mode Receiver
-		uart_s2 = cuart->Instance->S2 & UART_S2_LBKDIF_MASK >> UART_S2_LBKDIF_SHIFT;
-		bdhits = cuart->Instance->BDH & UART_BDH_LBKDIE_MASK >> UART_BDH_LBKDIE_SHIFT;
-		uart_s1 = cuart->Instance->S1 & UART_S1_RDRF_MASK >> UART_S1_RDRF_SHIFT;
-		c2its = cuart->Instance->C2 & UART_C2_RIE_MASK >> UART_C2_RIE_SHIFT;
-		if(((uart_s2 & bdhits) & (uart_s1 & c2its)) != RESET)
+		//UARTx has detected LIN Break Point
+		it_flags = __CSL_UART_GET_IT(cuart->Instance->BDH, UART_BDH_LBKDIE_MASK);
+		isr_flags = __CSL_UART_GET_FLAG(cuart->Instance->S2, UART_S2_LBKDIF_MASK);
+		if((it_flags && isr_flags) == SET)
 		{
-			UART_Receive_IT(cuart);
+			//clear LINBKP Flag
+			CLEAR_BIT(cuart->Instance->S2, UART_S2_LBKDIF_MASK);
+		
+			//Disable LINBKP Interrupt
+			CLEAR_BIT(cuart->Instance->BDH, UART_BDH_LBKDIE_MASK);
+		
+			//Break Point Detection Callback
+			CSL_UART_LIN_BKPCallback(cuart);
+			
 			return;
 		}
 		
-		//UART IDLE Interrupt
-		bdhits = cuart->Instance->C2 & UART_C2_ILIE_MASK;
-		uart_s1 = cuart->Instance->C1 & UART_S1_IDLE_MASK;
-		if((bdhits & uart_s1) != RESET)
+		//UARTx IDLE Interrupt
+		it_flags = __CSL_UART_GET_IT(cuart->Instance->C2, UART_C2_ILIE_MASK);
+		isr_flags = __CSL_UART_GET_FLAG(s1_flag, UART_S1_IDLE_MASK);
+		if((it_flags && isr_flags) == SET)
 		{
 			//Clear IDLE Flag
 			__CSL_UART_FLUSH_S1(cuart);
@@ -598,32 +614,31 @@ void CSL_UART_IRQHandler(UART_HandleTypeDef* cuart)
 			CSL_UART_IDLECallback(cuart);
 			/** Disable Interrupt or not depends on user **/
 		}
-		
 	}
 	
-	//error occured
-	if(errorflags != RESET)
+	//Some errors occured
+	if(errorflags == SET)
 	{
 		//Error Overflow
-		if((cuart->Instance->S1 & UART_Err_OR) != RESET)
+		if((s1_flag & UART_Err_OR) != RESET)
 		{
 			cuart->ErrorCode = CSL_UART_ERROR_ORE;
 		}
 		
 		//Error Noise
-		if((cuart->Instance->S1 & UART_Err_NF) != RESET)
+		if((s1_flag & UART_Err_NF) != RESET)
 		{
 			cuart->ErrorCode = CSL_UART_ERROR_NE;
 		}
 		
 		//Error Frame-error
-		if((cuart->Instance->S1 & UART_Err_FE) != RESET)
+		if((s1_flag & UART_Err_FE) != RESET)
 		{
 			cuart->ErrorCode = CSL_UART_ERROR_FE;
 		}
 		
 		//Error Parity
-		if((cuart->Instance->S1 & UART_Err_PF) != RESET)
+		if((s1_flag && UART_Err_PF) != RESET)
 		{
 			cuart->ErrorCode = CSL_UART_ERROR_PE;
 		}
@@ -649,19 +664,19 @@ void CSL_UART_IRQHandler(UART_HandleTypeDef* cuart)
 		return;
 	}
 	
-	//UART in mode Transmitter
-	uart_s1 = cuart->Instance->S1 & UART_S1_TDRE_MASK >> UART_S1_TDRE_SHIFT;
-	c2its = cuart->Instance->C2 & UART_C2_TIE_MASK>> UART_C2_TIE_SHIFT;
-	if((uart_s1 & c2its) != RESET)
+	//UARTx is in Mode Transmitter
+	it_flags = __CSL_UART_GET_IT(cuart->Instance->C2, UART_C2_TIE_MASK);
+	isr_flags = __CSL_UART_GET_FLAG(s1_flag, UART_S1_TDRE_MASK);
+	if((it_flags && isr_flags) == SET)
 	{
 		UART_Transmit_IT(cuart);
 		return;
 	}
 	
-	//UART in mode Transmitter End
-	uart_s1 = cuart->Instance->S1 & UART_S1_TC_MASK >> UART_S1_TC_SHIFT;
-	c2its = cuart->Instance->C2 & UART_C2_TCIE_MASK >> UART_C2_TCIE_SHIFT;
-	if((uart_s1 & c2its) != RESET)
+	//UARTx is in Mode Transmitter
+	it_flags = __CSL_UART_GET_IT(cuart->Instance->C2, UART_C2_TCIE_MASK);
+	isr_flags = __CSL_UART_GET_FLAG(s1_flag, UART_S1_TC_MASK);
+	if((it_flags && isr_flags) == SET)
 	{
 		UART_EndTransmit_IT(cuart);
 		return;
@@ -752,8 +767,7 @@ CSL_StatusTypeDef CSL_UART_TransmitBKP(UART_HandleTypeDef* cuart)
     
     //Unlock & end operations
     __CSL_UNLOCK(cuart);
-    
-    cuart->gState = CSL_UART_STATE_READY;
+	
     return CSL_OK;
 }
 
@@ -1002,21 +1016,6 @@ CSL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef* cuart)
 **/
 static CSL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef* cuart)
 {
-	//LIN Break Point Detection Enabled
-	if((cuart->Instance->S2 & 0x02) != 0)
-	{
-		//clear LINBKP Flag
-		CLEAR_BIT(cuart->Instance->S2, UART_S2_LBKDIF_MASK);
-		
-		//Disable LINBKP Interrupt
-		CLEAR_BIT(cuart->Instance->BDH, UART_BDH_LBKDIE_MASK);
-		
-		//Break Point Detection Callback
-		CSL_UART_LIN_BKPCallback(cuart);
-		
-		return CSL_OK;
-	}
-	
 	//Receiver
 	if(cuart->RxState == CSL_UART_STATE_BUSY_RX)
 	{

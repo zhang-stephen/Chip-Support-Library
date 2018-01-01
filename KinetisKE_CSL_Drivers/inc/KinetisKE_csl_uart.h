@@ -214,7 +214,7 @@ typedef struct
 /**
  * @brief	    Get UART Interrupt Bits
 **/
-#define __CSL_UART_GET_IT(__REG__, __FLAG__)			((__REG__ & (__FLAG__)) ? SET : RESET)
+#define __CSL_UART_GET_IT(__REG__, __IT__)			((__REG__ & (__IT__)) ? SET : RESET)
 
 /**
  * @brief	    Get UART Status Flags
